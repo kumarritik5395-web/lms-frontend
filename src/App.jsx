@@ -1,5 +1,5 @@
-import { BrowserRouter , Routes,Route} from 'react-router-dom'
-import './App.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -9,21 +9,20 @@ import AdminDashboard from './pages/AdminDashboard'
 import Navbar from "./components/Navbar"
 
 function App() {
-  
+
   return (
     <BrowserRouter>
-    <Navbar/>
+      <Navbar />
       <Routes>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/register" element={<Register/>}/>
-        <Route path="/books" element={<ProtectedRoute>< Books /></ProtectedRoute>}/>
-        <Route path="/profile" element={<ProtectedRoute>< Profile /></ProtectedRoute>}/>
-        <Route path="/admin" element={<ProtectedRoute><AdminDashboard role="admin" /></ProtectedRoute>}/>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/books" element={<ProtectedRoute>< Books /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute>< Profile /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminDashboard role="admin" /></ProtectedRoute>} />
       </Routes>
-    
+
     </BrowserRouter>
-      
+
   )
 }
-
 export default App

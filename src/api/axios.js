@@ -1,9 +1,12 @@
 import axios from "axios";
- 
+
+// Standard Vite environment variable with Render URL as default fallback
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://library-backend-lv44.onrender.com/api";
+
 const API = axios.create({
-  baseURL: "https://library-backend-lv44.onrender.com/api", 
+  baseURL: API_BASE_URL,
 });
- 
+
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -11,5 +14,5 @@ API.interceptors.request.use((req) => {
   }
   return req;
 });
- 
+
 export default API;
