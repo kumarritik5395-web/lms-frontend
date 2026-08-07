@@ -77,6 +77,7 @@ function Register() {
                   className="pl-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
                   required
                 />
               </div>
@@ -96,6 +97,7 @@ function Register() {
                   className="pl-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
                   required
                 />
               </div>
@@ -115,6 +117,7 @@ function Register() {
                   className="pl-10 pr-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
                   required
                 />
                 <button
