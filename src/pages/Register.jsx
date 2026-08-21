@@ -50,10 +50,8 @@ function Register() {
             <CardTitle className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Create Account
             </CardTitle>
-            <CardDescription className="text-slate-500 text-sm mt-1">
-              Join LMS Portal to manage & browse books
-            </CardDescription>
           </div>
+
         </CardHeader>
 
         <form onSubmit={handleRegister}>
@@ -73,7 +71,7 @@ function Register() {
                 <User className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 transition-colors" />
                 <Input
                   id="name"
-                  placeholder="John Doe"
+                  placeholder="Enter your name"
                   className="pl-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -93,7 +91,7 @@ function Register() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="Enter your email"
                   className="pl-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -113,7 +111,7 @@ function Register() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="pl-10 pr-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

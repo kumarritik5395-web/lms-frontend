@@ -33,7 +33,7 @@ function Login() {
 
   return (
     <div className="auth-bg-wrapper flex items-center justify-center p-4 sm:p-6">
-      {/* Background ambient glowing shapes & grid overlay */}
+
       <div className="auth-grid-overlay" />
       <div className="auth-blob auth-blob-1" />
       <div className="auth-blob auth-blob-2" />
@@ -52,10 +52,8 @@ function Login() {
             <CardTitle className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-slate-500 text-sm mt-1">
-              Enter your credentials to access LMS Portal
-            </CardDescription>
           </div>
+
         </CardHeader>
 
         <form onSubmit={handleLogin}>
@@ -76,7 +74,7 @@ function Login() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="Enter your email"
                   className="pl-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -98,7 +96,7 @@ function Login() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="pl-10 pr-10 h-10 auth-input border-slate-200 bg-white/70 rounded-xl"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
