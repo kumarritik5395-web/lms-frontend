@@ -24,7 +24,17 @@ function AdminDashboard() {
       const token = localStorage.getItem("token");
       const { data } = await API.post(
         "/books",
-        { name, author, copies: Number(copies), version: Number(version) },
+        {
+          name,
+          title: name,
+          bookName: name,
+          author,
+          authorName: author,
+          author_name: author,
+          writer: author,
+          copies: Number(copies),
+          version: Number(version)
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`
