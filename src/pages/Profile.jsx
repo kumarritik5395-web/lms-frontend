@@ -19,16 +19,41 @@ const getAuthorName = (book) => {
 };
 
 export default function Profile() {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || null;
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
+      const savedUser = JSON.parse(localStorage.getItem("user"));
       try {
-        const { data } = await API.get("/auth/profile");
-        setProfile(data.user);
+        let res;
+        try {
+          res = await API.get("/auth/profile");
+        } catch {
+          try {
+            res = await API.get("/auth/me");
+          } catch {
+            res = await API.get("/users/profile");
+          }
+        }
+        const userData = res.data?.user || res.data?.profile || res.data;
+        if (userData && (userData.name || userData.email)) {
+          setProfile(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
+        } else if (savedUser) {
+          setProfile(savedUser);
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
+        if (savedUser) {
+          setProfile(savedUser);
+        }
       } finally {
         setLoading(false);
       }
@@ -36,7 +61,7 @@ export default function Profile() {
     fetchProfile();
   }, []);
 
-  if (loading) {
+  if (loading && !profile) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
         <div className="flex items-center gap-2 text-muted-foreground">
@@ -50,8 +75,11 @@ export default function Profile() {
   if (!profile) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-        <Card className="max-w-md w-full text-center p-6">
-          <p className="text-destructive font-medium">Failed to load profile. Please log in again.</p>
+        <Card className="max-w-md w-full text-center p-6 space-y-3">
+          <p className="text-destructive font-medium">Failed to load profile. Session may have expired.</p>
+          <a href="/login" className="inline-block px-4 py-2 text-sm bg-amber-800 text-white rounded-lg font-medium hover:bg-amber-900 transition-colors">
+            Go to Login
+          </a>
         </Card>
       </div>
     );
