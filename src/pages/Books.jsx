@@ -44,31 +44,21 @@ const getAuthorName = (book) => {
 };
 
 export default function Books() {
-  // Redux
+
   const dispatch = useDispatch();
 
-  // Books Redux Store se milenge
   const books = useSelector((state) => state.Books);
 
-
-  // Local States
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
-
-  // Logged-in user
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // =========================
-  // FETCH BOOKS
-  // =========================
   const fetchBooks = async () => {
     setLoading(true);
 
     try {
       const { data } = await API.get("/books");
-
-      // API se books Redux me save
       dispatch(setBooks(data.books || []));
     } catch (error) {
       console.error("Error fetching books:", error);
@@ -77,14 +67,11 @@ export default function Books() {
     }
   };
 
-  // Component load hone par books fetch
   useEffect(() => {
     fetchBooks();
   }, []);
 
-  // =========================
-  // ISSUE BOOK
-  // =========================
+
   const issueBook = async (bookId) => {
     setActionLoading(`issue-${bookId}`);
 
@@ -96,7 +83,6 @@ export default function Books() {
 
       alert("Book issued successfully!");
 
-      // Redux data refresh
       await fetchBooks();
     } catch (error) {
       console.error("Issue book error:", error);
@@ -110,9 +96,6 @@ export default function Books() {
     }
   };
 
-  // =========================
-  // RETURN BOOK
-  // =========================
   const returnBook = async (bookId) => {
     setActionLoading(`return-${bookId}`);
 
@@ -124,7 +107,6 @@ export default function Books() {
 
       alert("Book returned successfully!");
 
-      // Redux data refresh
       await fetchBooks();
     } catch (error) {
       console.error("Return book error:", error);
@@ -138,9 +120,6 @@ export default function Books() {
     }
   };
 
-  // =========================
-  // SEARCH BOOKS
-  // =========================
   const filteredBooks = books.filter((book) => {
     const name = book.name?.toLowerCase() || "";
     const author = getAuthorName(book).toLowerCase();
@@ -152,14 +131,11 @@ export default function Books() {
     );
   });
 
-  // =========================
-  // UI
-  // =========================
+
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-[#F0E68C]/35 dark:bg-amber-950/20 py-6 px-4 sm:px-6">
       <div className="container mx-auto max-w-7xl">
 
-        {/* Header & Search Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
           <div>
@@ -174,7 +150,6 @@ export default function Books() {
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
 
-            {/* Search */}
             <div className="relative w-full sm:w-72">
 
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -190,7 +165,6 @@ export default function Books() {
 
             </div>
 
-            {/* Refresh */}
             <Button
               variant="outline"
               size="icon"
@@ -206,10 +180,6 @@ export default function Books() {
           </div>
         </div>
 
-        {/* ========================= */}
-        {/* LOADING */}
-        {/* ========================= */}
-
         {loading ? (
 
           <div className="text-center py-12 text-muted-foreground">
@@ -223,10 +193,6 @@ export default function Books() {
           </div>
 
         ) : filteredBooks.length === 0 ? (
-
-          /* ========================= */
-          /* NO BOOKS */
-          /* ========================= */
 
           <div className="text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
 
@@ -246,11 +212,7 @@ export default function Books() {
 
         ) : (
 
-          /* ========================= */
-          /* BOOK GRID */
-          /* ========================= */
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
 
             {filteredBooks.map((book) => {
 
@@ -265,17 +227,17 @@ export default function Books() {
                 >
 
                   {/* Card Header */}
-                  <CardHeader className="pb-3">
+                  <CardHeader className="p-4 sm:p-5 pb-3">
 
                     <div className="flex items-start justify-between gap-2">
 
-                      <CardTitle className="text-lg font-bold text-slate-900 leading-snug">
+                      <CardTitle className="text-base sm:text-lg font-bold text-slate-900 leading-snug line-clamp-2">
                         {book.name}
                       </CardTitle>
 
                       {/* Availability */}
                       <span
-                        className={`shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border ${isAvailable
+                        className={`shrink-0 inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border ${isAvailable
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                           : "bg-rose-50 text-rose-700 border-rose-200"
                           }`}
@@ -296,9 +258,9 @@ export default function Books() {
                     </div>
 
                     {/* Author */}
-                    <CardDescription className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-semibold text-xs mt-1.5 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-md w-fit border border-slate-200/60 dark:border-slate-700">
-                      <User className="h-3.5 w-3.5 text-amber-800 dark:text-amber-400" />
-                      <span>
+                    <CardDescription className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-semibold text-xs mt-2 bg-slate-100/80 dark:bg-slate-800/80 px-2.5 py-1 rounded-md w-fit max-w-full border border-slate-200/60 dark:border-slate-700">
+                      <User className="h-3.5 w-3.5 text-amber-800 dark:text-amber-400 shrink-0" />
+                      <span className="truncate">
                         Author: {getAuthorName(book)}
                       </span>
                     </CardDescription>
@@ -306,13 +268,13 @@ export default function Books() {
                   </CardHeader>
 
                   {/* Card Content */}
-                  <CardContent className="py-2 text-xs text-slate-500 space-y-1">
+                  <CardContent className="px-4 sm:px-5 py-1 sm:py-2 text-xs text-slate-500 space-y-1">
 
                     {book.version && (
 
                       <div className="flex items-center gap-1.5">
 
-                        <Layers className="h-3.5 w-3.5 text-slate-400" />
+                        <Layers className="h-3.5 w-3.5 text-slate-400 shrink-0" />
 
                         <span>
                           Version: {book.version}
@@ -325,13 +287,13 @@ export default function Books() {
                   </CardContent>
 
                   {/* Card Footer */}
-                  <CardFooter className="pt-3 gap-2 border-t border-slate-100 mt-2">
+                  <CardFooter className="p-4 sm:p-5 pt-3 gap-2 border-t border-slate-100 mt-2 flex-col xs:flex-row sm:flex-col lg:flex-row">
 
                     {/* ISSUE BUTTON */}
                     <Button
                       variant="default"
                       size="sm"
-                      className="flex-1 gap-1.5"
+                      className="w-full sm:w-full lg:flex-1 gap-1.5"
                       disabled={
                         !isAvailable ||
                         actionLoading ===
@@ -357,7 +319,7 @@ export default function Books() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 gap-1.5"
+                      className="w-full sm:w-full lg:flex-1 gap-1.5"
                       disabled={
                         actionLoading ===
                         `return-${book._id}`
