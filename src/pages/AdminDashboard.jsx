@@ -23,8 +23,8 @@ function AdminDashboard() {
     if (clean.includes("drive.google.com")) {
       // Replace /view?usp=sharing or /view or /edit with /preview
       clean = clean.replace(/\/view(\?.*)?$/, "/preview")
-                   .replace(/\/edit(\?.*)?$/, "/preview")
-                   .replace(/\/view\?.*$/, "/preview");
+        .replace(/\/edit(\?.*)?$/, "/preview")
+        .replace(/\/view\?.*$/, "/preview");
       if (!clean.endsWith("/preview")) {
         const fileIdMatch = clean.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (fileIdMatch && fileIdMatch[1]) {
@@ -96,11 +96,18 @@ function AdminDashboard() {
         alert("Kripya sirf valid PDF file select karein!");
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setPdfUrl(event.target.result);
-      };
-      reader.readAsDataURL(file);
+      // If file is small (< 1MB), use Base64 data URL
+      if (file.size <= 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setPdfUrl(event.target.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // If file is large (> 1MB), create Object Blob URL so browser renders it without 413 payload backend crash
+        const objectUrl = URL.createObjectURL(file);
+        setPdfUrl(objectUrl);
+      }
     }
   };
 
