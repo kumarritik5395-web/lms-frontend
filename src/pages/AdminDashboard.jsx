@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../api/axios";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Plus, BookPlus, User, Hash, Layers, CheckCircle, FolderOpen } from "lucide-react";
+import { ShieldCheck, Plus, BookPlus, User, Hash, Layers, CheckCircle, FolderOpen, Trash2 } from "lucide-react";
 
 function AdminDashboard() {
   const [name, setName] = useState("");
@@ -104,6 +104,44 @@ function AdminDashboard() {
     }
   };
 
+  const [booksList, setBooksList] = useState([]);
+  const [deleteLoading, setDeleteLoading] = useState(null);
+
+  const fetchBooksList = async () => {
+    try {
+      const { data } = await API.get("/books");
+      setBooksList(data.books || []);
+    } catch (err) {
+      console.error("Error fetching books list:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchBooksList();
+  }, []);
+
+  const handleDeleteBook = async (bookId, bookTitle) => {
+    if (!window.confirm(`Kya aap "${bookTitle}" book ko library se delete karna chahte hain?`)) {
+      return;
+    }
+    setDeleteLoading(bookId);
+    try {
+      const token = localStorage.getItem("token");
+      await API.delete(`/books/${bookId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      alert("Book deleted successfully!");
+      await fetchBooksList();
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert(error.response?.data?.message || "Failed to delete book");
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
+
   return (
     /* Page Background Wrapper with Khaki Theme */
     <div className="min-h-[calc(100vh-4rem)] bg-[#F0E68C]/35 dark:bg-amber-950/20 py-8 px-4 sm:px-6">
@@ -118,7 +156,7 @@ function AdminDashboard() {
               Admin Control Panel
             </h1>
             <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-              Manage library inventory, upload PDF books from device or add online PDF links.
+              Manage library inventory, add new books, upload PDFs, and delete existing books.
             </p>
           </div>
         </div>
@@ -252,9 +290,9 @@ function AdminDashboard() {
                   <Input
                     id="pdf-url"
                     type="text"
-                    placeholder="https://example.com/sample-book.pdf"
+                    placeholder="https://drive.google.com/file/d/... or direct PDF link"
                     className="h-10 bg-slate-50/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 rounded-xl text-xs"
-                    value={pdfUrl.startsWith("data:") ? "[ PDF File Selected from Device ]" : pdfUrl}
+                    value={pdfUrl}
                     onChange={(e) => setPdfUrl(e.target.value)}
                   />
                 </div>
@@ -273,6 +311,43 @@ function AdminDashboard() {
               </Button>
             </CardFooter>
           </form>
+        </Card>
+
+        {/* MANAGE EXISTING BOOKS & DELETE SECTION */}
+        <Card className="max-w-2xl mx-auto shadow-md border-amber-900/10 bg-white/95 dark:bg-slate-900/90 backdrop-blur-sm rounded-2xl">
+          <CardHeader className="pb-3 border-b border-amber-900/10">
+            <CardTitle className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-rose-700" />
+              <span>Manage Existing Books & Delete</span>
+            </CardTitle>
+            <CardDescription className="text-xs text-slate-500">
+              Library catalog me se galat ya purani books delete karein.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4 divide-y divide-slate-100 dark:divide-slate-800">
+            {booksList.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-4">No books in inventory.</p>
+            ) : (
+              booksList.map((b) => (
+                <div key={b._id} className="py-3 flex items-center justify-between gap-3">
+                  <div className="truncate">
+                    <h4 className="font-bold text-sm text-slate-800 dark:text-white truncate">{b.name || b.title}</h4>
+                    <p className="text-xs text-slate-500 truncate">Author: {b.author || "Unknown"} | Copies: {b.copies ?? 0}</p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="h-8 gap-1.5 text-xs bg-rose-600 hover:bg-rose-700 text-white rounded-lg shrink-0 cursor-pointer"
+                    disabled={deleteLoading === b._id}
+                    onClick={() => handleDeleteBook(b._id, b.name || b.title)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>{deleteLoading === b._id ? "Deleting..." : "Delete"}</span>
+                  </Button>
+                </div>
+              ))
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>
