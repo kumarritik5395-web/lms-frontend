@@ -16,6 +16,21 @@ function AdminDashboard() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
+  // Helper function to sanitize and format Google Drive links
+  const formatPdfLink = (url) => {
+    if (!url) return "";
+    let clean = url.trim();
+    if (clean.includes("drive.google.com")) {
+      // Replace /view or /edit with /preview for clean embedding
+      clean = clean.replace(/\/view.*$/, "/preview").replace(/\/edit.*$/, "/preview");
+      if (!clean.endsWith("/preview")) {
+        clean = clean.replace(/\?.*$/, "");
+        if (!clean.endsWith("/preview")) clean += "/preview";
+      }
+    }
+    return clean;
+  };
+
   const handleAddBook = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -23,6 +38,8 @@ function AdminDashboard() {
     setErrorMsg("");
     try {
       const token = localStorage.getItem("token");
+      const finalPdfUrl = formatPdfLink(pdfUrl);
+
       const { data } = await API.post(
         "/books",
         {
@@ -35,9 +52,9 @@ function AdminDashboard() {
           writer: author,
           copies: Number(copies),
           version: Number(version),
-          pdfUrl: pdfUrl,
-          pdf: pdfUrl,
-          fileUrl: pdfUrl,
+          pdfUrl: finalPdfUrl,
+          pdf: finalPdfUrl,
+          fileUrl: finalPdfUrl,
         },
         {
           headers: {
@@ -221,7 +238,7 @@ function AdminDashboard() {
                     onChange={handleFileChange}
                     className="bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-900 rounded-xl h-12 pt-1.5 cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-800 file:text-white hover:file:bg-amber-900 shadow-sm"
                   />
-                  
+
                   <div className="flex items-center gap-2 my-1">
                     <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase">OR Enter PDF URL</span>
@@ -237,7 +254,7 @@ function AdminDashboard() {
                     onChange={(e) => setPdfUrl(e.target.value)}
                   />
                 </div>
-                <p className="text-[11px] text-slate-500">Device se PDF choose karein ya direct URL paste karein.</p>
+                <p className="text-[11px] text-slate-500">Select a PDF from your device or paste a direct URL.</p>
               </div>
             </CardContent>
 
