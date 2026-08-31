@@ -52,12 +52,17 @@ function AdminDashboard() {
       setVersion("");
       setPdfUrl("");
     } catch (error) {
-      const msg = error.response?.data?.message || "Failed to add book";
-      if (error.response?.status === 401 || msg.toLowerCase().includes("token")) {
-        setErrorMsg("Session expired or invalid token. Please log in again.");
-      } else {
-        setErrorMsg(msg);
+      console.error("Add book error details:", error);
+      let msg = error.response?.data?.message || error.message || "Failed to add book";
+
+      if (error.response?.status === 413) {
+        msg = "Selected PDF file is too large to send directly. Kripya chhota PDF file select karein ya PDF ka Web/Google Drive URL link paste karein.";
+      } else if (error.response?.status === 401 || msg.toLowerCase().includes("token") || msg.toLowerCase().includes("unauthorized")) {
+        msg = "Session expired or invalid admin token. Please log in again.";
+      } else if (error.response?.data && typeof error.response.data === "string") {
+        msg = error.response.data;
       }
+      setErrorMsg(msg);
     } finally {
       setLoading(false);
     }
