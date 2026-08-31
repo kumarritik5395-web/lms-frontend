@@ -21,11 +21,15 @@ function AdminDashboard() {
     if (!url) return "";
     let clean = url.trim();
     if (clean.includes("drive.google.com")) {
-      // Replace /view or /edit with /preview for clean embedding
-      clean = clean.replace(/\/view.*$/, "/preview").replace(/\/edit.*$/, "/preview");
+      // Replace /view?usp=sharing or /view or /edit with /preview
+      clean = clean.replace(/\/view(\?.*)?$/, "/preview")
+                   .replace(/\/edit(\?.*)?$/, "/preview")
+                   .replace(/\/view\?.*$/, "/preview");
       if (!clean.endsWith("/preview")) {
-        clean = clean.replace(/\?.*$/, "");
-        if (!clean.endsWith("/preview")) clean += "/preview";
+        const fileIdMatch = clean.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (fileIdMatch && fileIdMatch[1]) {
+          clean = `https://drive.google.com/file/d/${fileIdMatch[1]}/preview`;
+        }
       }
     }
     return clean;

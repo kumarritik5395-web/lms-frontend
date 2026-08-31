@@ -9,7 +9,7 @@ export default function BookReaderModal({ book, onClose }) {
 
   const getPdfUrl = (b) => {
     if (!b) return "";
-    let rawUrl = b.pdfUrl || b.pdf_url || b.pdf || b.fileUrl || b.file_url || b.url || b.link || b.pdfLink || b.bookPdf || "";
+    let rawUrl = b.pdfUrl || b.pdf_url || b.pdf || b.fileUrl || b.file_url || b.url || b.link || b.pdfLink || b.bookPdf || b.driveUrl || b.drive_url || "";
     if (typeof rawUrl === "object" && rawUrl !== null) {
       rawUrl = rawUrl.url || rawUrl.link || rawUrl.secure_url || "";
     }
@@ -25,7 +25,8 @@ export default function BookReaderModal({ book, onClose }) {
       return url;
     }
     if (url.includes("drive.google.com")) {
-      return url.replace(/\/view.*$/, "/preview");
+      if (url.includes("/preview")) return url;
+      return url.replace(/\/view.*$/, "/preview").replace(/\/edit.*$/, "/preview");
     }
     if (url.endsWith(".pdf") || url.includes(".pdf?")) {
       return `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
