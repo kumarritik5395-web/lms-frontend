@@ -11,6 +11,7 @@ function AdminDashboard() {
   const [author, setAuthor] = useState("");
   const [copies, setCopies] = useState("");
   const [version, setVersion] = useState("");
+  const [pdfUrl, setPdfUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -33,7 +34,10 @@ function AdminDashboard() {
           author_name: author,
           writer: author,
           copies: Number(copies),
-          version: Number(version)
+          version: Number(version),
+          pdfUrl: pdfUrl,
+          pdf: pdfUrl,
+          fileUrl: pdfUrl,
         },
         {
           headers: {
@@ -46,6 +50,7 @@ function AdminDashboard() {
       setAuthor("");
       setCopies("");
       setVersion("");
+      setPdfUrl("");
     } catch (error) {
       const msg = error.response?.data?.message || "Failed to add book";
       if (error.response?.status === 401 || msg.toLowerCase().includes("token")) {
@@ -181,6 +186,26 @@ function AdminDashboard() {
                       required
                     />
                   </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="pdf-url" className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    Original Book PDF / Document URL (Optional)
+                  </Label>
+                  <div className="relative">
+                    <BookPlus className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-700" />
+                    <Input
+                      id="pdf-url"
+                      type="url"
+                      placeholder="https://example.com/sample-book.pdf"
+                      className="pl-10 h-11 bg-slate-50/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 rounded-xl"
+                      value={pdfUrl}
+                      onChange={(e) => setPdfUrl(e.target.value)}
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-500">Provide direct link to the book PDF so users can read original book pages.</p>
                 </div>
               </div>
             </CardContent>

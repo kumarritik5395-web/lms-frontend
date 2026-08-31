@@ -26,7 +26,9 @@ import {
   CheckCircle2,
   XCircle,
   RefreshCw,
+  FileText,
 } from "lucide-react";
+import BookReaderModal from "@/components/BookReaderModal";
 
 const getAuthorName = (book) => {
   if (!book) return "Unknown";
@@ -52,6 +54,7 @@ export default function Books() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
+  const [activeBookForReading, setActiveBookForReading] = useState(null);
   const user = JSON.parse(localStorage.getItem("user"));
 
   const fetchBooks = async () => {
@@ -287,7 +290,18 @@ export default function Books() {
                   </CardContent>
 
                   {/* Card Footer */}
-                  <CardFooter className="p-4 sm:p-5 pt-3 gap-2 border-t border-slate-100 mt-2 flex-col xs:flex-row sm:flex-col lg:flex-row">
+                  <CardFooter className="p-4 sm:p-5 pt-3 gap-2 border-t border-slate-100 mt-2 flex-col sm:flex-col lg:flex-row">
+
+                    {/* READ ORIGINAL BOOK BUTTON */}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full lg:w-auto bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold gap-1.5 border border-amber-300/60"
+                      onClick={() => setActiveBookForReading(book)}
+                    >
+                      <FileText className="h-4 w-4 text-amber-800" />
+                      <span>Read Pages</span>
+                    </Button>
 
                     {/* ISSUE BUTTON */}
                     <Button
@@ -349,6 +363,14 @@ export default function Books() {
 
           </div>
 
+        )}
+
+        {/* ORIGINAL BOOK READER MODAL */}
+        {activeBookForReading && (
+          <BookReaderModal
+            book={activeBookForReading}
+            onClose={() => setActiveBookForReading(null)}
+          />
         )}
 
       </div>
