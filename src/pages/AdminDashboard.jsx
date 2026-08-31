@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Plus, BookPlus, User, Hash, Layers, CheckCircle } from "lucide-react";
+import { ShieldCheck, Plus, BookPlus, User, Hash, Layers, CheckCircle, FolderOpen } from "lucide-react";
 
 function AdminDashboard() {
   const [name, setName] = useState("");
@@ -63,6 +63,21 @@ function AdminDashboard() {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+        alert("Kripya sirf valid PDF file select karein!");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPdfUrl(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     /* Page Background Wrapper with Khaki Theme */
     <div className="min-h-[calc(100vh-4rem)] bg-[#F0E68C]/35 dark:bg-amber-950/20 py-8 px-4 sm:px-6">
@@ -77,7 +92,7 @@ function AdminDashboard() {
               Admin Control Panel
             </h1>
             <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-              Manage library inventory, add new books with author details, copies count, and versions.
+              Manage library inventory, upload PDF books from device or add online PDF links.
             </p>
           </div>
         </div>
@@ -189,24 +204,35 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="pdf-url" className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                    Original Book PDF / Document URL (Optional)
-                  </Label>
-                  <div className="relative">
-                    <BookPlus className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-700" />
-                    <Input
-                      id="pdf-url"
-                      type="url"
-                      placeholder="https://example.com/sample-book.pdf"
-                      className="pl-10 h-11 bg-slate-50/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 rounded-xl"
-                      value={pdfUrl}
-                      onChange={(e) => setPdfUrl(e.target.value)}
-                    />
+              <div className="space-y-1.5">
+                <Label htmlFor="pdf-file-picker" className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  Original Book PDF / Document File (Select from Computer)
+                </Label>
+                <div className="space-y-2">
+                  <Input
+                    id="pdf-file-picker"
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    onChange={handleFileChange}
+                    className="bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-900 rounded-xl h-12 pt-1.5 cursor-pointer file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-amber-800 file:text-white hover:file:bg-amber-900 shadow-sm"
+                  />
+                  
+                  <div className="flex items-center gap-2 my-1">
+                    <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">OR Enter PDF URL</span>
+                    <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
                   </div>
-                  <p className="text-[11px] text-slate-500">Provide direct link to the book PDF so users can read original book pages.</p>
+
+                  <Input
+                    id="pdf-url"
+                    type="text"
+                    placeholder="https://example.com/sample-book.pdf"
+                    className="h-10 bg-slate-50/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 rounded-xl text-xs"
+                    value={pdfUrl.startsWith("data:") ? "[ PDF File Selected from Device ]" : pdfUrl}
+                    onChange={(e) => setPdfUrl(e.target.value)}
+                  />
                 </div>
+                <p className="text-[11px] text-slate-500">Device se PDF choose karein ya direct URL paste karein.</p>
               </div>
             </CardContent>
 

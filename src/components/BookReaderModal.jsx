@@ -7,7 +7,36 @@ export default function BookReaderModal({ book, onClose }) {
 
   if (!book) return null;
 
-  const pdfUrl = book.pdfUrl || book.pdf || book.fileUrl || book.url;
+  const getPdfUrl = (b) => {
+    if (!b) return "";
+    let rawUrl = b.pdfUrl || b.pdf_url || b.pdf || b.fileUrl || b.file_url || b.url || b.link || b.pdfLink || b.bookPdf || "";
+    if (typeof rawUrl === "object" && rawUrl !== null) {
+      rawUrl = rawUrl.url || rawUrl.link || rawUrl.secure_url || "";
+    }
+    return typeof rawUrl === "string" ? rawUrl.trim() : "";
+  };
+
+  const pdfUrl = getPdfUrl(book);
+
+  // Smart URL handler for local file:// URLs, web http:// URLs, and google drive
+  const getEmbedUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("file://") || url.startsWith("blob:") || url.startsWith("data:") || url.startsWith("/")) {
+      return url;
+    }
+    if (url.includes("drive.google.com")) {
+      return url.replace(/\/view.*$/, "/preview");
+    }
+    if (url.endsWith(".pdf") || url.includes(".pdf?")) {
+      return `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+    }
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    }
+    return url;
+  };
+
+  const embedUrl = getEmbedUrl(pdfUrl);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-2 sm:p-4 animate-in fade-in duration-200">
@@ -24,7 +53,7 @@ export default function BookReaderModal({ book, onClose }) {
             </div>
             <div className="truncate">
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">
-                {book.name || "Original Book Pages"}
+                {book.name || book.title || "Original Book Pages"}
               </h2>
               <p className="text-xs text-slate-500 truncate">
                 Author: {book.author || "Unknown"}
@@ -34,18 +63,31 @@ export default function BookReaderModal({ book, onClose }) {
 
           <div className="flex items-center gap-2 shrink-0">
             {pdfUrl && (
-              <a
-                href={pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                download
-                className="hidden sm:inline-flex"
-              >
-                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
-                  <Download className="h-3.5 w-3.5" />
-                  <span>Download</span>
-                </Button>
-              </a>
+              <>
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex"
+                >
+                  <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs bg-slate-50">
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>Open Link</span>
+                  </Button>
+                </a>
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="hidden sm:inline-flex"
+                >
+                  <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                    <Download className="h-3.5 w-3.5" />
+                    <span>Download</span>
+                  </Button>
+                </a>
+              </>
             )}
 
             <Button
@@ -74,9 +116,10 @@ export default function BookReaderModal({ book, onClose }) {
         <div className="flex-1 bg-slate-100 dark:bg-slate-950 relative overflow-hidden flex items-center justify-center">
           {pdfUrl ? (
             <iframe
-              src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1`}
+              src={embedUrl}
               className="w-full h-full border-none"
               title={book.name || "Book Reader"}
+              allow="autoplay; encrypted-media; fullscreen"
             />
           ) : (
             <div className="text-center p-8 max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 shadow-sm">
@@ -85,7 +128,7 @@ export default function BookReaderModal({ book, onClose }) {
                 No PDF / Original Pages Uploaded
               </h3>
               <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                Is book ke liye original pages ya PDF link attach nahi kiya gaya hai. Admin Panel se edit karke URL add kar sakte hain.
+                Is book ke liye PDF link attach nahi mila. Admin Panel se new book add karke try karein.
               </p>
             </div>
           )}
